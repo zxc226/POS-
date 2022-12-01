@@ -35,6 +35,7 @@ namespace Cs
 
         public static Meggers Meggers = new Meggers();
         public static List<string> zg = new List<string>();
+        public static List<CearData> dddTA = new List<CearData>();
         public static Dal.DBhelp openclass = new DBhelp();
 
         static void Main(string[] args)
@@ -84,7 +85,7 @@ namespace Cs
             jexx.Add("实收银：");
             jexx.Add("总金额：");
             jexx.Add("数量：");
-            jexx.Add("占比：");
+            jexx.Add("应找银：");
 
             Console.CursorSize = 24;
             Console.SetWindowSize(width: Console.WindowWidth, height: Console.WindowHeight);
@@ -153,12 +154,12 @@ namespace Cs
                     i++;
 
                 }
-                zg.Add("12");
-                zg.Add("13");
-                zg.Add("14");
-                zg.Add("15");
-                zg.Add("16");
-                zg.Add("17");
+                zg.Add("0");
+                zg.Add("0");
+                zg.Add("0");
+                zg.Add("0");
+                zg.Add("0");
+                zg.Add("0");
                 zgxs(zg);
 
             }
@@ -169,7 +170,7 @@ namespace Cs
             Console.SetCursorPosition(1, 2);
             Console.Write("编号：");
 
-            Console.SetCursorPosition(Console.WindowWidth / 6, 2);
+            Console.SetCursorPosition(Console.WindowWidth / 5, 2);
             Console.Write("数量：");
 
             Console.SetCursorPosition(Console.WindowWidth / 2 + 12, Console.WindowHeight - 5);
@@ -201,10 +202,18 @@ namespace Cs
                     }
                     break;
                 case "2"://数量
-                    Console.SetCursorPosition(Console.WindowWidth / 6 + 6, 2);
-                    allopen.bh = Console.ReadLine();
+                    Console.SetCursorPosition(Console.WindowWidth / 5 + 6, 2);
+                    var num = Console.ReadLine();
+                    if (num == null||num=="")
+                    {
+                        allopen.number = 1;
+                    }
+                    else
+                    {
+                        allopen.number = Convert.ToInt32(num);
+                    }
                     keyInfo = Console.ReadKey(true);
-                    if (keyInfo.Key == ConsoleKey.Enter)
+                    if (keyInfo.Key == ConsoleKey.Tab)
                     {
                         xzxhs = "3";
                         xzsr(xzxhs);
@@ -212,6 +221,27 @@ namespace Cs
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
                         Loginer();
+                        zg.Clear();
+                    }
+                    else
+                    {
+                        var data1 = GetSp("",allopen.bh);
+                        CearData cear = new CearData();
+                        cear.bh = data1.spbh;
+                        cear.dw = data1.dw;
+                        cear.number = allopen.number;
+                        cear.price = data1.price;
+                        cear.spmc = data1.spmc;
+                        cear.xh = data1.xh;
+                        cear.zkje = data1.zkprice;
+                        cear.ysje = data1.price * Convert.ToDecimal(allopen.number) / data1.zkprice;
+                        dddTA.Add(cear);
+                        
+                        for (int i = 0; i < dddTA.Count; i++)
+                        {
+                            Console.SetCursorPosition(0, 6 + i);
+                            Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i].xh, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje,dddTA[i].ysje);
+                        }
                     }
                     break;
                 case "3"://购物卡
@@ -226,6 +256,7 @@ namespace Cs
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
                         Loginer();
+                        zg.Clear();
                     }
                     break;
                 case "4"://付款方式
@@ -240,6 +271,7 @@ namespace Cs
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
                         Loginer();
+                        zg.Clear();
                     }
                     break;
                 default:
@@ -292,6 +324,8 @@ namespace Cs
         public static void Menter()
         {
             Console.Clear();
+            dddTA.Clear();
+            zg.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Gray;
             for (int i = 0; i < 50; i++)
@@ -445,7 +479,8 @@ namespace Cs
                                 xhnum = xhnum + 1;
                             }
                         }
-                        sp.xh = openclass.sp.ToList().Count.ToString();
+                        var xxh = openclass.sp.ToList().Count + 1;
+                        sp.xh = xxh.ToString();
                         sp.spbh = spp[0].ToString();
                         sp.spmc = spp[1].ToString();
                         sp.price = Convert.ToDecimal(spp[2].ToString());
