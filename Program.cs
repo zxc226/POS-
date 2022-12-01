@@ -35,6 +35,7 @@ namespace Cs
 
         public static Meggers Meggers = new Meggers();
         public static List<string> zg = new List<string>();
+        public static List<CearData> dddTA = new List<CearData>();
         public static Dal.DBhelp openclass = new DBhelp();
 
         static void Main(string[] args)
@@ -84,7 +85,7 @@ namespace Cs
             jexx.Add("实收银：");
             jexx.Add("总金额：");
             jexx.Add("数量：");
-            jexx.Add("占比：");
+            jexx.Add("应找银：");
 
             Console.CursorSize = 24;
             Console.SetWindowSize(width: Console.WindowWidth, height: Console.WindowHeight);
@@ -153,12 +154,10 @@ namespace Cs
                     i++;
 
                 }
-                zg.Add("12");
-                zg.Add("13");
-                zg.Add("14");
-                zg.Add("15");
-                zg.Add("16");
-                zg.Add("17");
+                for (int i = 0; i < 6; i++)
+                {
+                    zg.Add("0");
+                }
                 zgxs(zg);
 
             }
@@ -169,13 +168,20 @@ namespace Cs
             Console.SetCursorPosition(1, 2);
             Console.Write("编号：");
 
-            Console.SetCursorPosition(Console.WindowWidth / 6, 2);
+            Console.SetCursorPosition(Console.WindowWidth / 5, 2);
             Console.Write("数量：");
 
             Console.SetCursorPosition(Console.WindowWidth / 2 + 12, Console.WindowHeight - 5);
             Console.Write("购物卡号：");
             Console.SetCursorPosition(Console.WindowWidth / 2 + 12, Console.WindowHeight - 7);
             Console.Write("收款方式：");
+            Console.SetCursorPosition(Console.WindowWidth / 2 + 12, Console.WindowHeight - 3);
+            Console.Write("收款金额：");
+            for (int i = 0; i < dddTA.Count; i++)
+            {
+                Console.SetCursorPosition(0, 6 + i);
+                Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i].xh, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje, dddTA[i].ysje);
+            }
             xzsr("1");
 
         }
@@ -197,21 +203,78 @@ namespace Cs
                     }
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        Loginer();
+                        Menter();
                     }
                     break;
                 case "2"://数量
-                    Console.SetCursorPosition(Console.WindowWidth / 6 + 6, 2);
-                    allopen.bh = Console.ReadLine();
+                    Console.SetCursorPosition(Console.WindowWidth / 5 + 6, 2);
+                    var num = Console.ReadLine();
+                    if (num == null || num == "")
+                    {
+                        allopen.number = 1;
+                    }
+                    else
+                    {
+                        allopen.number = Convert.ToInt32(num);
+                    }
                     keyInfo = Console.ReadKey(true);
-                    if (keyInfo.Key == ConsoleKey.Enter)
+                    if (keyInfo.Key == ConsoleKey.Tab)
                     {
                         xzxhs = "3";
                         xzsr(xzxhs);
                     }
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        Loginer();
+                        Menter();
+                        zg.Clear();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var data1 = GetSp("", allopen.bh);
+                            if (data1 == null)
+                            {
+                                Meggers.Meggerbox("添加失败", "该编号输入有误，请确认后再输入！", "wraning", 0, 0);
+                                zg.Clear();
+                                gznr();
+                            }
+                            else
+                            {
+                                CearData cear = new CearData();
+                                cear.bh = data1.spbh;
+                                cear.dw = data1.dw;
+                                cear.number = allopen.number;
+                                cear.price = data1.price;
+                                cear.spmc = data1.spmc;
+                                cear.xh = (dddTA.Count() + 1).ToString();
+                                cear.zkje = data1.zkprice;
+                                cear.ysje = (data1.price * Convert.ToDecimal(allopen.number) / data1.zkprice).ToString().Substring(0, 4);
+                                dddTA.Add(cear);
+                                int j = 0;
+                                for (int i = 0; i < dddTA.Count; i++)
+                                {
+                                    
+                                        if (i / 20 == 0)
+                                        {
+                                            j = 0;
+                                        }
+                                        Console.SetCursorPosition(0, 6 + j);
+                                        Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i].xh, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje, dddTA[i].ysje);
+                                    
+
+
+                                }
+
+                                xzsr("1");
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            Meggers.Meggerbox("添加失败", "该编号输入有误，请确认后再输入！", "warring", 0, 0);
+                        }
+
                     }
                     break;
                 case "3"://购物卡
@@ -225,12 +288,33 @@ namespace Cs
                     }
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        Loginer();
+                        Menter();
+                        zg.Clear();
                     }
                     break;
                 case "4"://付款方式
                     Console.SetCursorPosition(Console.WindowWidth / 2 + 22, Console.WindowHeight - 7);
-                    allopen.bh = Console.ReadLine();
+                    var ss = Console.ReadLine();
+                    if (ss == null || ss == "")
+                    {
+                        ss = "0";
+                    }
+                    allopen.fkfs = Convert.ToInt32(ss);
+                    keyInfo = Console.ReadKey(true);
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        xzxhs = "5";
+                        xzsr(xzxhs);
+                    }
+                    else if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        Menter();
+                        zg.Clear();
+                    }
+                    break;
+                case "5"://付款方式
+                    Console.SetCursorPosition(Console.WindowWidth / 2 + 22, Console.WindowHeight - 3);
+                    allopen.ysy = Console.ReadLine();
                     keyInfo = Console.ReadKey(true);
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
@@ -239,7 +323,8 @@ namespace Cs
                     }
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        Loginer();
+                        Menter();
+                        zg.Clear();
                     }
                     break;
                 default:
@@ -292,6 +377,8 @@ namespace Cs
         public static void Menter()
         {
             Console.Clear();
+            dddTA.Clear();
+            zg.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Gray;
             for (int i = 0; i < 50; i++)
@@ -445,7 +532,8 @@ namespace Cs
                                 xhnum = xhnum + 1;
                             }
                         }
-                        sp.xh = openclass.sp.ToList().Count.ToString();
+                        var xxh = openclass.sp.ToList().Count + 1;
+                        sp.xh = xxh.ToString();
                         sp.spbh = spp[0].ToString();
                         sp.spmc = spp[1].ToString();
                         sp.price = Convert.ToDecimal(spp[2].ToString());
@@ -649,16 +737,15 @@ namespace Cs
                 return data;
             }
             else
-          if (name != "" || name != null)
-            {
-                var data = openclass.sp.Where(s => s.spmc.Contains(name)).AsNoTracking().FirstOrDefault();
-
-                return data;
-            }
-            else
           if (bh != "" || bh != null)
             {
                 var data = openclass.sp.Where(s => s.spbh == bh).AsNoTracking().FirstOrDefault();
+                return data;
+            }
+            else
+          if (name != "" || name != null)
+            {
+                var data = openclass.sp.Where(s => s.spmc.Contains(name)).AsNoTracking().FirstOrDefault();
                 return data;
             }
             else
@@ -759,6 +846,14 @@ namespace Cs
         /// <summary>
         /// 登入
         /// </summary>
+        public static void loginers(string name ,string pwd)
+        {
+
+        }
+
+        /// <summary>
+        /// 登入
+        /// </summary>
         public static void loginers()
         {
 
@@ -766,6 +861,7 @@ namespace Cs
 
         public static void zgxs(List<string> zg)
         {
+
             for (int i = 0; i < zg.Count; i++)
             {
                 Console.SetCursorPosition(Console.WindowWidth / 2 + 20, Console.WindowHeight - 14 + i);
