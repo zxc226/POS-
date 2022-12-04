@@ -182,6 +182,7 @@ namespace Cs
                 Console.SetCursorPosition(0, 6 + i);
                 Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i].xh, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje, dddTA[i].ysje);
             }
+
             xzsr("1");
 
         }
@@ -251,17 +252,31 @@ namespace Cs
                                 cear.zkje = data1.zkprice;
                                 cear.ysje = (data1.price * Convert.ToDecimal(allopen.number) / data1.zkprice).ToString().Substring(0, 4);
                                 dddTA.Add(cear);
-                                int j = 0;
-                                for (int i = 0; i < dddTA.Count; i++)
+                                var ssum = zgxx(dddTA);
+                                if (ssum.GetValue(4) == null)
                                 {
-                                    
-                                        if (i / 20 == 0)
-                                        {
-                                            j = 0;
-                                        }
-                                        Console.SetCursorPosition(0, 6 + j);
-                                        Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i].xh, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje, dddTA[i].ysje);
-                                    
+                                    zgxs(zg);
+                                }
+                                else
+                                {
+                                    zg.Clear();
+                                    for (int i = 0; i < ssum.Length; i++)
+                                    {
+                                        zg.Add(ssum.GetValue(i).ToString());
+                                    }
+                                    zgxs(zg);
+                                }
+                                int j = 0;
+                                for (int i = 1; i < dddTA.Count; i++)
+                                {
+
+                                    if (i % 20 == 0)
+                                    {
+                                        j = 0;
+                                    }
+                                    Console.SetCursorPosition(0, 6 + j);
+                                    Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i-1].xh, dddTA[i-1].bh, dddTA[i-1].spmc, dddTA[i-1].price, dddTA[i-1].number, dddTA[i-1].dw, dddTA[i-1].zkje, dddTA[i-1].ysje);
+                                    j++;
 
 
                                 }
@@ -273,6 +288,7 @@ namespace Cs
                         catch (Exception e)
                         {
                             Meggers.Meggerbox("添加失败", "该编号输入有误，请确认后再输入！", "warring", 0, 0);
+                            dddTA.Clear();
                         }
 
                     }
@@ -312,7 +328,7 @@ namespace Cs
                         zg.Clear();
                     }
                     break;
-                case "5"://付款方式
+                case "5"://应收金额
                     Console.SetCursorPosition(Console.WindowWidth / 2 + 22, Console.WindowHeight - 3);
                     allopen.ysy = Console.ReadLine();
                     keyInfo = Console.ReadKey(true);
@@ -846,9 +862,17 @@ namespace Cs
         /// <summary>
         /// 登入
         /// </summary>
-        public static void loginers(string name ,string pwd)
+        public static void loginers(string name, string pwd)
         {
-
+            var data = openclass.Logins.Where(s => s.pwd == pwd && s.user == name).ToList().Count;
+            if (data > 0)
+            {
+                gznr();
+            }
+            else
+            {
+                Meggers.Meggerbox("警告", "当前账号密码有误，请重新输入！", "warning", 0, 0);
+            }
         }
 
         /// <summary>
@@ -868,6 +892,44 @@ namespace Cs
                 Console.WriteLine("{0}\t\t\t\t\t  {1}\n", zg[i * 2 - i], zg[i * 2 + 1 - i]);
                 i++;
             }
+        }
+
+        public static Array zgxx(List<CearData> ts)
+        {
+            string[] array = new string[6];
+            if (ts.Count >= 2 && ts != null)
+            {
+                for (int i = 1; i < ts.Count; i++)
+                {
+                    array[0] = (ts[i].price + ts[i - 1].price).ToString().PadRight(5, '0').Substring(0, 4);
+                    array[1] = (ts[i].zkje + ts[i - 1].zkje).ToString().PadRight(5, '0').Substring(0, 4);
+                    array[2] = "0";
+                    array[3] = (Convert.ToDecimal(array[0]) * Convert.ToDecimal(array[1])).ToString().PadRight(5, '0').Substring(0, 4);
+                    array[4] = (ts[i].number + ts[i - 1].number).ToString();
+                    array[5] = "0";
+                }
+                return array;
+            }
+            else
+            {
+                CearData cearData = new CearData();
+                cearData.spmc = "";
+                cearData.price = 0;
+                cearData.number = 0;
+                cearData.bh = "";
+                cearData.dw = "";
+                cearData.xh = "";
+                cearData.ysje = "";
+                cearData.zkje = 0;
+                ts.Add(cearData);
+                return array;
+            }
+
+        }
+
+        public static bool sysaver()
+        {
+            return true;
         }
 
     }
