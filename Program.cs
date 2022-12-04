@@ -848,7 +848,15 @@ namespace Cs
         /// </summary>
         public static void loginers(string name ,string pwd)
         {
-
+            var data = openclass.Logins.Where(s => s.pwd == pwd && s.user == name).ToList().Count;
+            if (data>0)
+            {
+                gznr();
+            }
+            else
+            {
+                Meggers.Meggerbox("警告","当前账号密码有误，请重新输入！","warning",0,0);
+            }
         }
 
         /// <summary>
