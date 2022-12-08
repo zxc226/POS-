@@ -32,7 +32,8 @@ namespace Cs
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         public static Moder.Allopen allopen = new Moder.Allopen();
-
+        public static string dqpe;
+        public static string DRNAME;
         public static Meggers Meggers = new Meggers();
         public static List<string> zg = new List<string>();
         public static List<CearData> dddTA = new List<CearData>();
@@ -138,7 +139,9 @@ namespace Cs
                     i++;
                 }
                 Console.SetCursorPosition(15, Console.WindowHeight - 14 + zffs.Count - 2);
-                Console.WriteLine("{0}\t\t\t\t{1}\n", "JZ" + DateTime.Now.ToLongTimeString() + r.Next(0, 999999).ToString(), "Admmin");
+                dqpe = "JZ" + DateTime.Now.ToLongTimeString()+ r.Next(0, 999999).ToString();
+                DRNAME = "Admmin";
+                Console.WriteLine("{0}\t\t\t\t{1}\n", dqpe , DRNAME);
             }
             catch (Exception e)
             {
@@ -341,6 +344,19 @@ namespace Cs
                     {
                         Menter();
                         zg.Clear();
+                    }
+                    else
+                    {
+                        var DATA=sysaver(dddTA,allopen.syy,DRNAME);
+                        if (DATA==true)
+                        {
+                            Meggers.Meggerbox("提示", "账单保存成功！", "success", 0, 0);
+                            gznr();
+                        }
+                        else
+                        {
+                            Meggers.Meggerbox("提示", "账单保存失败！", "warning", 0, 0);
+                        }
                     }
                     break;
                 default:
@@ -927,8 +943,63 @@ namespace Cs
 
         }
 
-        public static bool sysaver()
+        public static bool sysaver(List<CearData> cears,string dqdh,string syy)
         {
+            for (int i = 0; i < cears.Count; i++)
+            {
+                cears[i].dqdh = dqdh;
+                openclass.CearDatas.Add(cears[i]);
+                openclass.SaveChanges();
+            }
+            Allopen allopenss = new Allopen();
+            allopenss.bh = (openclass.Allopen.Count()+1).ToString();
+            allopenss.dqdh = dqdh;
+            allopenss.fkfs = allopen.fkfs;
+            allopenss.gwkh = allopen.gwkh;
+            allopenss.number = Convert.ToInt32(zg[4].ToString()==null?"0": zg[4].ToString());
+            allopenss.ssy = allopen.ssy;
+            allopenss.syy = syy;
+            allopenss.ysy = zg[0].ToString()==null?"": zg[0].ToString();
+            allopenss.zje = zg[3].ToString()==null?"": zg[3].ToString();
+            allopenss.zkje = zg[1].ToString()==null?"": zg[1].ToString();
+            openclass.Allopen.Add(allopenss);
+            openclass.SaveChanges();
+            return true;
+        }
+
+        public static bool AddDR(Login login)
+        {
+            openclass.Logins.Add(login);
+            openclass.SaveChanges();
+            return true;
+        }
+
+        public static bool Addshopcard(ShpinCard login)
+        {
+            openclass.shpinCards.Add(login);
+            openclass.SaveChanges();
+            return true;
+        }
+
+        public static bool UpdateDR(Login login)
+        {
+            openclass.Logins.Update(login);
+            openclass.SaveChanges();
+            return true;
+        }
+
+        public static bool Updateshopcard(ShpinCard login)
+        {
+            openclass.shpinCards.Update(login);
+            openclass.SaveChanges();
+            return true;
+        }
+
+        public static bool Delshopcard(string login)
+        {
+            var date = openclass.shpinCards.Where(s => s.SPcard == login).FirstOrDefault();
+            openclass.shpinCards.Remove(date);
+            openclass.SaveChanges();
             return true;
         }
 
