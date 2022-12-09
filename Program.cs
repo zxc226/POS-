@@ -183,7 +183,7 @@ namespace Cs
             for (int i = 0; i < dddTA.Count; i++)
             {
                 Console.SetCursorPosition(0, 6 + i);
-                Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", dddTA[i].xh, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje, dddTA[i].ysje);
+                Console.WriteLine("{0}\t{1}\t\t{2}\t\t\t\t{3}\t\t{4}\t\t{5}\t\t\t{6}\t\t\t{7}\n", i, dddTA[i].bh, dddTA[i].spmc, dddTA[i].price, dddTA[i].number, dddTA[i].dw, dddTA[i].zkje, dddTA[i].ysje);
             }
 
             xzsr("1");
@@ -333,7 +333,7 @@ namespace Cs
                     break;
                 case "5"://应收金额
                     Console.SetCursorPosition(Console.WindowWidth / 2 + 22, Console.WindowHeight - 3);
-                    allopen.ysy = Console.ReadLine();
+                    allopen.ssy = Console.ReadLine();
                     keyInfo = Console.ReadKey(true);
                     if (keyInfo.Key == ConsoleKey.Enter)
                     {
@@ -351,11 +351,15 @@ namespace Cs
                         if (DATA==true)
                         {
                             Meggers.Meggerbox("提示", "账单保存成功！", "success", 0, 0);
+                            dddTA.Clear();
+                            zg.Clear();
                             gznr();
                         }
                         else
                         {
                             Meggers.Meggerbox("提示", "账单保存失败！", "warning", 0, 0);
+                            dddTA.Clear();
+                            zg.Clear();
                         }
                     }
                     break;
@@ -573,6 +577,7 @@ namespace Cs
                         sp.dw = spp[4].ToString();
                         sp.zkprice = Convert.ToDecimal(spp[5].ToString());
                         sp.ysprice = Convert.ToDecimal(spp[6].ToString());
+                        
                         keyInfo = Console.ReadKey(true);
                         AddArry(sp);
                         Meggers.Meggerbox("成功", "操作成功！", "SUCCESS", 0, 0);
@@ -948,6 +953,7 @@ namespace Cs
             for (int i = 0; i < cears.Count; i++)
             {
                 cears[i].dqdh = dqdh;
+                cears[i].xh =Guid.NewGuid().ToString();
                 openclass.CearDatas.Add(cears[i]);
                 openclass.SaveChanges();
             }
